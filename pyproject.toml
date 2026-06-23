@@ -1,0 +1,39 @@
+[build-system]
+requires = ["setuptools>=42", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "campaign-forge"
+version = "0.1.0"
+description = "Interactive digital marketing lab"
+requires-python = ">=3.9"
+dependencies = [
+    "fastapi>=0.111",
+    "uvicorn[standard]>=0.30",
+    "sqlalchemy>=2.0",
+    "alembic>=1.13",
+    "psycopg2-binary>=2.9",
+    "python-dotenv>=1.0",
+    "pydantic[email]>=2.0",
+    "bcrypt>=4.0",
+    "python-jose[cryptography]>=3.3",
+    "slowapi>=0.1.9",
+    "redis>=5.0",
+]
+
+[project.scripts]
+campaign-forge = "campaign_forge.cli:cli"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["campaign_forge*"]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+    "pytest-cov>=4.0",
+    "httpx>=0.27",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
