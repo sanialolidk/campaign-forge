@@ -57,6 +57,13 @@ class UTMParams(BaseModel):
             raise ValueError("URL must start with http:// or https://")
         return v
 
+    @field_validator("source", "medium", "campaign")
+    @classmethod
+    def required_fields_not_empty(cls, v: str) -> str:
+        if not v.strip():
+            raise ValueError("Field cannot be empty")
+        return v.strip()
+
 
 class UTMResult(BaseModel):
     utm_url: str

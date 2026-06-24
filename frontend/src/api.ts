@@ -17,7 +17,8 @@ async function req<T>(path: string, init?: RequestInit): Promise<T> {
   });
   if (res.status === 401) {
     localStorage.removeItem('cf_token');
-    window.location.reload();
+    window.dispatchEvent(new Event('cf:logout'));
+    throw new Error('Session expired — please sign in again');
   }
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));

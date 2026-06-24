@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AuthForm } from './components/AuthForm';
 import { LearnTab } from './components/LearnTab';
@@ -21,6 +21,12 @@ function App() {
     setToken(null);
     qc.clear();
   };
+
+  useEffect(() => {
+    const handler = () => handleLogout();
+    window.addEventListener('cf:logout', handler);
+    return () => window.removeEventListener('cf:logout', handler);
+  }, []);
 
   return (
     <QueryClientProvider client={qc}>
