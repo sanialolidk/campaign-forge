@@ -1,4 +1,4 @@
-from pydantic import BaseModel, ConfigDict, EmailStr
+from pydantic import BaseModel, ConfigDict, EmailStr, field_validator, model_validator
 from typing import Optional
 from datetime import datetime
 
@@ -6,6 +6,13 @@ from datetime import datetime
 class UserRegister(BaseModel):
     email: EmailStr
     password: str
+
+    @field_validator("password")
+    @classmethod
+    def password_min_length(cls, v: str) -> str:
+        if len(v) < 8:
+            raise ValueError("Password must be at least 8 characters")
+        return v
 
 
 class UserLogin(BaseModel):
@@ -43,6 +50,13 @@ class UTMParams(BaseModel):
     term: Optional[str] = None
     content: Optional[str] = None
 
+    @field_validator("url")
+    @classmethod
+    def url_must_be_http(cls, v: str) -> str:
+        if not v.startswith(("http://", "https://")):
+            raise ValueError("URL must start with http:// or https://")
+        return v
+
 
 class UTMResult(BaseModel):
     utm_url: str
@@ -54,6 +68,14 @@ class ABTestInput(BaseModel):
     conversions_a: int
     visitors_b: int
     conversions_b: int
+
+    @model_validator(mode="after")
+    def conversions_cannot_exceed_visitors(self) -> "ABTestInput":
+        if self.conversions_a > self.visitors_a:
+            raise ValueError("Conversions A cannot exceed visitors A")
+        if self.conversions_b > self.visitors_b:
+            raise ValueError("Conversions B cannot exceed visitors B")
+        return self
 
 
 class ABTestResult(BaseModel):
@@ -67,6 +89,20 @@ class ABTestResult(BaseModel):
 class BudgetInput(BaseModel):
     total_budget: float
     channels: list[str]
+
+    @field_validator("channels")
+    @classmethod
+    def channels_not_empty(cls, v: list) -> list:
+        if not v:
+            raise ValueError("Select at least one channel")
+        return v
+
+    @field_validator("total_budget")
+    @classmethod
+    def budget_positive(cls, v: float) -> float:
+        if v <= 0:
+            raise ValueError("Budget must be greater than zero")
+        return v
 
 
 class BudgetResult(BaseModel):

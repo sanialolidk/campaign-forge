@@ -15,6 +15,11 @@ def list_modules(db: Session = Depends(get_db), current_user: User = Depends(get
     return db.query(Module).order_by(Module.order).all()
 
 
+@router.get("/progress/me", response_model=List[ProgressResponse])
+def my_progress(db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    return db.query(Progress).filter(Progress.user_id == current_user.id).all()
+
+
 @router.get("/{slug}", response_model=ModuleResponse)
 def get_module(slug: str, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     module = db.query(Module).filter(Module.slug == slug).first()
@@ -39,8 +44,3 @@ def complete_module(slug: str, db: Session = Depends(get_db), current_user: User
     db.commit()
     db.refresh(progress)
     return progress
-
-
-@router.get("/progress/me", response_model=List[ProgressResponse])
-def my_progress(db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
-    return db.query(Progress).filter(Progress.user_id == current_user.id).all()

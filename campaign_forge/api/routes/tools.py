@@ -31,8 +31,8 @@ def build_utm(body: UTMParams, current_user: User = Depends(get_current_user)):
         params["utm_content"] = body.content
 
     parsed = urlparse(body.url)
-    separator = "&" if parsed.query else "?"
-    utm_url = f"{body.url}{separator}{urlencode(params)}"
+    existing_params = parsed.query + ("&" if parsed.query else "") + urlencode(params)
+    utm_url = urlunparse(parsed._replace(query=existing_params))
     return UTMResult(utm_url=utm_url, params=params)
 
 
